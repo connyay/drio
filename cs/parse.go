@@ -132,7 +132,7 @@ func (td *Transaction) parse(b []byte) error {
 }
 
 func accountID(boxes []gosseract.BoundingBox) (string, error) {
-	acctBox, accountIdx := findBoundingBox(boxes, point(83, 1360), point(2352, 1419))
+	acctBox, accountIdx := findBoundingBox(boxes, image.Rect(83, 1360, 2352, 1419))
 	if accountIdx < 0 {
 		return "", errors.New("missing account number")
 	}
@@ -149,7 +149,7 @@ func accountID(boxes []gosseract.BoundingBox) (string, error) {
 }
 
 func cusip(boxes []gosseract.BoundingBox) (string, error) {
-	cusipBox, cusipIdx := findBoundingBoxPoint(boxes, point(1700, 1111))
+	cusipBox, cusipIdx := findBoundingBoxPoint(boxes, image.Pt(1700, 1111))
 	if cusipIdx < 0 {
 		return "", errors.New("missing cusip")
 	}
@@ -166,7 +166,7 @@ func cusip(boxes []gosseract.BoundingBox) (string, error) {
 }
 
 func positions(boxes []gosseract.BoundingBox) (open, close decimal.Decimal, err error) {
-	_, sharePositionHeaderIdx := findBoundingBox(boxes, point(96, 1701), point(1742, 1777))
+	_, sharePositionHeaderIdx := findBoundingBox(boxes, image.Rect(96, 1701, 1742, 1777))
 	if sharePositionHeaderIdx < 0 {
 		return open, close, errors.New("missing share position header")
 	}
@@ -190,7 +190,7 @@ func positions(boxes []gosseract.BoundingBox) (open, close decimal.Decimal, err 
 }
 
 func (td *Transaction) transaction(boxes []gosseract.BoundingBox) (err error) {
-	_, transactionHeaderIdx := findBoundingBox(boxes, point(84, 2043), point(312, 2080))
+	_, transactionHeaderIdx := findBoundingBox(boxes, image.Rect(84, 2043, 312, 2080))
 	if transactionHeaderIdx < 0 {
 		return errors.New("missing transaction header")
 	}
@@ -306,11 +306,10 @@ func boundingBoxesFromImage(src image.Image) ([]gosseract.BoundingBox, error) {
 	return bbs, nil
 }
 
-func findBoundingBox(boxes []gosseract.BoundingBox, min, max image.Point) (gosseract.BoundingBox, int) {
-	for idx, box := range boxes {
-		if box.Box.Min.X == min.X && box.Box.Min.Y == min.Y &&
-			box.Box.Max.X == max.X && box.Box.Max.Y == max.Y {
-			return box, idx
+func findBoundingBox(boxes []gosseract.BoundingBox, box image.Rectangle) (gosseract.BoundingBox, int) {
+	for idx, b := range boxes {
+		if b.Box == box {
+			return b, idx
 		}
 	}
 	return gosseract.BoundingBox{}, -1
@@ -325,5 +324,3 @@ func findBoundingBoxPoint(boxes []gosseract.BoundingBox, point image.Point) (gos
 	}
 	return gosseract.BoundingBox{}, -1
 }
-
-func point(x, y int) image.Point { return image.Point{x, y} }
