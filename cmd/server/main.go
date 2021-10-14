@@ -41,8 +41,10 @@ func (cmd *ServeCmd) Run() error {
 	)
 	switch {
 	case cmd.DSN == "" || cmd.DSN == "memory":
+		log.Println("Using memory store")
 		s = store.NewMem()
 	case strings.HasPrefix(cmd.DSN, "postgres://"):
+		log.Println("Using postgres store")
 		s, err = store.NewPG(cmd.DSN)
 		if err != nil {
 			return fmt.Errorf("%w", err)
