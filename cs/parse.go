@@ -132,16 +132,16 @@ func (td *Transaction) parse(b []byte) error {
 }
 
 func accountID(boxes []gosseract.BoundingBox) (string, error) {
-	acctBox, accountIdx := findBoundingBox(boxes, image.Rect(83, 1360, 2352, 1419))
+	acctBB, accountIdx := findBoundingBox(boxes, image.Rect(83, 1360, 2352, 1419))
 	if accountIdx < 0 {
 		return "", errors.New("missing account number")
 	}
-	accountIDMatch := _accountNumberRe.FindStringSubmatch(acctBox.Word)
-	if len(accountIDMatch) != 2 {
-		log.Printf("unusual account number match len %d", len(accountIDMatch))
+	match := _accountNumberRe.FindStringSubmatch(acctBB.Word)
+	if len(match) != 2 {
+		log.Printf("unusual account number match len %d", len(match))
 		return "", errors.New("incorrect account number matches")
 	}
-	accountID := accountIDMatch[1]
+	accountID := match[1]
 	if accountID == "" {
 		return "", errors.New("empty account number")
 	}
@@ -149,16 +149,16 @@ func accountID(boxes []gosseract.BoundingBox) (string, error) {
 }
 
 func cusip(boxes []gosseract.BoundingBox) (string, error) {
-	cusipBox, cusipIdx := findBoundingBoxPoint(boxes, image.Pt(1700, 1111))
+	cusipBB, cusipIdx := findBoundingBoxPoint(boxes, image.Pt(1700, 1111))
 	if cusipIdx < 0 {
 		return "", errors.New("missing cusip")
 	}
-	cusipMatch := _cusipRe.FindStringSubmatch(cusipBox.Word)
-	if len(cusipMatch) != 2 {
-		log.Printf("unusual cusip match len %d", len(cusipMatch))
+	match := _cusipRe.FindStringSubmatch(cusipBB.Word)
+	if len(match) != 2 {
+		log.Printf("unusual cusip match len %d", len(match))
 		return "", errors.New("incorrect cusip matches")
 	}
-	cusip := cusipMatch[1]
+	cusip := match[1]
 	if cusip == "" {
 		return "", errors.New("empty cusip")
 	}
