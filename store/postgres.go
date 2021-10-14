@@ -19,6 +19,8 @@ var embedSource = &migration.EmbedMigrationSource{
 	Dir:     "postgres/migrations",
 }
 
+// NewPG returns an initialized Store backed by postgres based on the given
+// connection string.
 func NewPG(dsn string) (Store, error) {
 	pool, err := pgxpool.Connect(context.Background(), dsn)
 	if err != nil {
@@ -71,9 +73,11 @@ FROM transactions WHERE cusip = $1 ORDER BY transaction_date desc`, CUSIP)
 	transactions = make([]Transaction, 0)
 	for rows.Next() {
 		var tx Transaction
-		if err := rows.Scan(&tx.IDHash, &tx.AccountIDHash, &tx.CUSIP,
+		if err := rows.Scan(
+			&tx.IDHash, &tx.AccountIDHash, &tx.CUSIP,
 			&tx.Description, &tx.Amount, &tx.DeductionAmount,
-			&tx.NetAmount, &tx.PricePerShare, &tx.TotalShares, &tx.Date); err != nil {
+			&tx.NetAmount, &tx.PricePerShare, &tx.TotalShares, &tx.Date,
+		); err != nil {
 			return nil, err
 		}
 		transactions = append(transactions, tx)
@@ -107,7 +111,6 @@ func (pg *pgstore) GetAllPositions(CUSIP string) (positions []Position, err erro
 	if err != nil {
 		return nil, err
 	}
-	positions = make([]Position, 0)
 	defer rows.Close()
 	for rows.Next() {
 		var p Position

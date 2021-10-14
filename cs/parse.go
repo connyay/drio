@@ -21,14 +21,14 @@ import (
 )
 
 var (
-	_accountNumberRe = regexp.MustCompile(`. Holder Account Number: (C\d{10})`)
+	_accountNumberRe = regexp.MustCompile(`. Holder Account Number: (C0{3}\d{7})`) // note: allows for millions of account numbers. Will break if tens of millions :)
 	_cusipRe         = regexp.MustCompile(`CUSIP ([0-9]{3}[a-zA-Z0-9]{6})`)
-	_transactionRe   = regexp.MustCompile(`(?P<date>\d{2} [a-zA-Z]{3} \d{4})(?P<description>\D*)(?P<transaction_amount>[0-9.,]+) (?P<deduction_amount>[0-9.,]+)(?P<deduction_type>\D*)(?P<net_amount>[0-9.,]+) (?P<price_per_share>[0-9.,]+) (?P<total_shares>[0-9.,]+)`)
+	// I'm really sorry for this regex. https://regex101.com/r/oyS0Kw/1
+	_transactionRe = regexp.MustCompile(`(?P<date>\d{2} [a-zA-Z]{3} \d{4})(?P<description>\D*)(?P<transaction_amount>[0-9.,]+) (?P<deduction_amount>[0-9.,]+)(?P<deduction_type>\D*)(?P<net_amount>[0-9.,]+) (?P<price_per_share>[0-9.,]+) (?P<total_shares>[0-9.,]+)`)
 
+	// Salts to prevent brute forcing to reverse account numbers.
 	_txIDSalt      = os.Getenv("TX_ID_SALT")
 	_accountIDSalt = os.Getenv("ACCOUNT_ID_SALT")
-
-	_transactionDateLayout = "2 Jan 2006"
 )
 
 // Transaction is parsed from a transaction statement.
@@ -205,7 +205,8 @@ func (td *Transaction) transaction(boxes []gosseract.BoundingBox) (err error) {
 		value := strings.TrimSpace(match[i])
 		switch name {
 		case "date":
-			td.Date, err = time.Parse(_transactionDateLayout, value)
+			layout := "2 Jan 2006"
+			td.Date, err = time.Parse(layout, value)
 		case "description":
 			td.Description = value
 		case "transaction_amount":
@@ -269,16 +270,16 @@ func (td *Transaction) verify(doc *fitz.Document) error {
 		}
 	}
 	// Basic math sanity check
-	if !td.ClosePosition.Sub(td.OpenPosition).Equal(td.TotalShares) {
+	switch {
+	case !td.ClosePosition.Sub(td.OpenPosition).Equal(td.TotalShares):
 		return errors.New("basic position math is incorrect")
-	}
-	if !td.Amount.Sub(td.DeductionAmount).Equal(td.NetAmount) {
+	case !td.Amount.Sub(td.DeductionAmount).Equal(td.NetAmount):
 		return errors.New("basic amount math is incorrect")
-	}
-	if !td.TotalShares.Mul(td.PricePerShare).Round(2).Equal(td.NetAmount) {
+	case !td.TotalShares.Mul(td.PricePerShare).Round(2).Equal(td.NetAmount):
 		log.Printf("total=%v pps=%v %v!=%v", td.TotalShares, td.PricePerShare, td.TotalShares.Mul(td.PricePerShare).Round(2), td.NetAmount)
 		return errors.New("basic price math is incorrect")
 	}
+
 	return nil
 }
 

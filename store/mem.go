@@ -10,6 +10,7 @@ type positionKey struct {
 	CUSIP         string
 }
 
+// NewMem returns an initialized Store backed by in memory storage.
 func NewMem() Store {
 	return &memStore{
 		positions:    map[positionKey]Position{},
