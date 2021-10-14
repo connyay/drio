@@ -19,6 +19,7 @@ import (
 
 var cli struct {
 	Serve ServeCmd `cmd:"" default:"1" help:"Start server."`
+	Reset ResetCmd `cmd:"" help:"Reset database."`
 }
 
 func main() {
