@@ -34,12 +34,13 @@ func (ms *memStore) InsertTransaction(transaction Transaction) error {
 	return nil
 }
 
-func (ms *memStore) GetAllTransactions() (transactions []Transaction, err error) {
+func (ms *memStore) GetTransactions(CUSIP string) (transactions []Transaction, err error) {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
-	transactions = make([]Transaction, 0, len(ms.transactions))
 	for _, transaction := range ms.transactions {
-		transactions = append(transactions, transaction)
+		if transaction.CUSIP == CUSIP {
+			transactions = append(transactions, transaction)
+		}
 	}
 	sort.Slice(transactions, func(i, j int) bool {
 		return transactions[j].Date.Before(transactions[i].Date)

@@ -48,7 +48,7 @@ func TransactionCreateHandler(db store.Store, log *logrus.Logger) http.HandlerFu
 				"err":        err,
 				"request_ip": req.RemoteAddr,
 			}).Error("failed inserting transaction")
-			http.Error(rw, "failed insert", http.StatusBadRequest)
+			http.Error(rw, "failed inserting transaction", http.StatusBadRequest)
 			return
 		}
 
@@ -82,7 +82,9 @@ func TotalsHandler(db store.Store, log *logrus.Logger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 		totals, err := db.GetTotals()
 		if err != nil {
-			log.Printf("failed get all %v", err)
+			log.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("get totals")
 			http.Error(rw, "", http.StatusInternalServerError)
 			return
 		}
@@ -97,9 +99,16 @@ func TotalsHandler(db store.Store, log *logrus.Logger) http.HandlerFunc {
 
 func TransactionListHandler(db store.Store, log *logrus.Logger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
-		transactions, err := db.GetAllTransactions()
+		cusip := req.URL.Query().Get("cusip")
+		if cusip == "" {
+			http.Error(rw, "missing cusip", http.StatusBadRequest)
+			return
+		}
+		transactions, err := db.GetTransactions(cusip)
 		if err != nil {
-			log.Printf("failed get all %v", err)
+			log.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("get transactions")
 			http.Error(rw, "", http.StatusInternalServerError)
 			return
 		}
@@ -107,7 +116,9 @@ func TransactionListHandler(db store.Store, log *logrus.Logger) http.HandlerFunc
 			"transactions": transactions,
 		})
 		if err != nil {
-			log.Printf("err %v", err)
+			log.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("encoding json body")
 		}
 	}
 }

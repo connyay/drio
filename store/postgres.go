@@ -57,13 +57,13 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	return nil
 }
 
-func (pg *pgstore) GetAllTransactions() (transactions []Transaction, err error) {
+func (pg *pgstore) GetTransactions(CUSIP string) (transactions []Transaction, err error) {
 	rows, err := pg.pool.Query(context.Background(), `
 SELECT
 	id_hash, account_id_hash, cusip,
 	description, amount, deduction_amount,
 	net_amount, price_per_share, total_shares, transaction_date
-FROM transactions ORDER BY transaction_date desc`)
+FROM transactions WHERE cusip = $1 ORDER BY transaction_date desc`, CUSIP)
 	if err != nil {
 		return nil, err
 	}
