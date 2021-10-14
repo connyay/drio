@@ -12,6 +12,7 @@ import (
 
 	"github.com/connyay/drclub/api"
 	"github.com/connyay/drclub/store"
+	"github.com/connyay/drclub/web"
 )
 
 var cli struct {
@@ -53,6 +54,7 @@ func (cmd *ServeCmd) Run() error {
 	r.Post("/api/transactions", api.TransactionCreateHandler(s, log))
 	r.Get("/api/transactions", api.TransactionListHandler(s, log))
 	r.Get("/api/totals", api.TotalsHandler(s, log))
+	r.NotFound(web.AssetHandler)
 	log.Printf("Listening on %s", cmd.Addr)
 	return http.ListenAndServe(cmd.Addr, r)
 }
