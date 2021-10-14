@@ -102,6 +102,7 @@ AGPL-3.0 License
       but would be nice to not have that dependency.
 - [ ] Docs
 - [ ] Tests
+- [ ] Reduce the size of the chonker docker image
 
 [computershare]: https://www.computershare.com/us
 [nakedshortselling]: https://en.wikipedia.org/wiki/Naked_short_selling
