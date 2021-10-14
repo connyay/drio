@@ -26,6 +26,8 @@ type Store interface {
 	SetPosition(position Position) error
 	// GetTotals returns a map of cusip to total shares and account.
 	GetTotals() (map[string]Total, error)
+	// Reset clears all transactions and positions.
+	Reset() error
 }
 
 // Transaction holds the values of a transaction that are stored.

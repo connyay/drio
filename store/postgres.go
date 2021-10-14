@@ -156,3 +156,16 @@ func (pg *pgstore) migrate() error {
 	}
 	return nil
 }
+
+func (pg *pgstore) Reset() error {
+	ctx := context.Background()
+	cmds := []string{`TRUNCATE TABLE positions`, `TRUNCATE TABLE transactions`}
+	for _, cmd := range cmds {
+		_, err := pg.pool.Exec(ctx, cmd)
+		if err != nil {
+			return fmt.Errorf("running cmd %q %w", cmd, err)
+		}
+
+	}
+	return nil
+}

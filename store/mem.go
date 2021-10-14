@@ -73,3 +73,11 @@ func (ms *memStore) GetTotals() (map[string]Total, error) {
 	}
 	return totals, nil
 }
+
+func (ms *memStore) Reset() error {
+	ms.mu.RLock()
+	defer ms.mu.RUnlock()
+	ms.positions = map[positionKey]Position{}
+	ms.transactions = nil
+	return nil
+}

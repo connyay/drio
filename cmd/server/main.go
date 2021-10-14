@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -31,34 +32,53 @@ type ServeCmd struct {
 }
 
 func (cmd *ServeCmd) Run() error {
+	store, err := getStore(cmd.DSN)
+	if err != nil {
+		return err
+	}
 	log := logrus.New()
 	r := chi.NewRouter()
 	r.Use(logging(log))
 	r.Use(middleware.Recoverer)
-	var (
-		s   store.Store
-		err error
-	)
-	switch {
-	case cmd.DSN == "" || cmd.DSN == "memory":
-		log.Println("Using memory store")
-		s = store.NewMem()
-	case strings.HasPrefix(cmd.DSN, "postgres://"):
-		log.Println("Using postgres store")
-		s, err = store.NewPG(cmd.DSN)
-		if err != nil {
-			return fmt.Errorf("%w", err)
-		}
-	default:
-		return fmt.Errorf("unknown database url %q", cmd.DSN)
-	}
-
-	r.Post("/api/transactions", api.TransactionCreateHandler(s, log))
-	r.Get("/api/transactions", api.TransactionListHandler(s, log))
-	r.Get("/api/totals", api.TotalsHandler(s, log))
+	r.Post("/api/transactions", api.TransactionCreateHandler(store, log))
+	r.Get("/api/transactions", api.TransactionListHandler(store, log))
+	r.Get("/api/totals", api.TotalsHandler(store, log))
 	r.NotFound(web.AssetHandler)
 	log.Printf("Listening on %s", cmd.Addr)
 	return http.ListenAndServe(cmd.Addr, r)
+}
+
+type ResetCmd struct {
+	DSN string `help:"DSN to use for backing store." env:"DATABASE_URL"`
+}
+
+func (cmd *ResetCmd) Run() error {
+	store, err := getStore(cmd.DSN)
+	if err != nil {
+		return err
+	}
+	err = store.Reset()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getStore(dsn string) (store.Store, error) {
+	switch {
+	case dsn == "" || dsn == "memory":
+		log.Println("Using memory store")
+		return store.NewMem(), nil
+	case strings.HasPrefix(dsn, "postgres://"):
+		log.Println("Using postgres store")
+		s, err := store.NewPG(dsn)
+		if err != nil {
+			return nil, fmt.Errorf("%w", err)
+		}
+		return s, nil
+	default:
+		return nil, fmt.Errorf("unknown database url %q", dsn)
+	}
 }
 
 func logging(logger logrus.FieldLogger) func(h http.Handler) http.Handler {
