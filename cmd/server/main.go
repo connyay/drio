@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -25,9 +26,8 @@ func main() {
 }
 
 type ServeCmd struct {
-	Addr  string `help:"Address to listen on." default:"0.0.0.0:8080" env:"LISTEN_ADDR"`
-	Store string `help:"Backing store to use." default:"mem" env:"STORE"`
-	DSN   string `help:"DSN to use for backing store." env:"STORE_DSN"`
+	Addr string `help:"Address to listen on." default:"0.0.0.0:8080" env:"LISTEN_ADDR"`
+	DSN  string `help:"DSN to use for backing store." env:"DATABASE_URL"`
 }
 
 func (cmd *ServeCmd) Run() error {
@@ -39,16 +39,16 @@ func (cmd *ServeCmd) Run() error {
 		s   store.Store
 		err error
 	)
-	switch cmd.Store {
-	case "mem":
+	switch {
+	case cmd.DSN == "" || cmd.DSN == "memory":
 		s = store.NewMem()
-	case "pg":
+	case strings.HasPrefix(cmd.DSN, "postgres://"):
 		s, err = store.NewPG(cmd.DSN)
 		if err != nil {
 			return fmt.Errorf("%w", err)
 		}
 	default:
-		return fmt.Errorf("unknown store %q", cmd.Store)
+		return fmt.Errorf("unknown database url %q", cmd.DSN)
 	}
 
 	r.Post("/api/transactions", api.TransactionCreateHandler(s, log))
