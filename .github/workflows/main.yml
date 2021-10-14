@@ -16,7 +16,9 @@ jobs:
     name: Deploy app
     runs-on: ubuntu-latest
     steps:
+      - name: Set env.BRANCH
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions@1.1
         with:
-          args: "deploy --config ./deployments/fly.toml --app connyay-drio-${{ github.ref }}"
+          args: "deploy --config ./deployments/fly.toml --app connyay-drio-${{ env.BRANCH }}"
