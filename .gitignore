@@ -15,3 +15,5 @@
 # vendor/
 
 .env
+
+bb_*.json
