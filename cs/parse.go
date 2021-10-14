@@ -3,16 +3,19 @@ package cs
 import (
 	"bufio"
 	"bytes"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"image"
 	"image/png"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/bieber/barcode"
+	"github.com/connyay/drclub/store"
 	"github.com/karmdip-mi/go-fitz"
 	"github.com/otiai10/gosseract/v2"
 	"github.com/shopspring/decimal"
@@ -67,6 +70,9 @@ var (
 	_accountNumberRe = regexp.MustCompile(`. Holder Account Number: (C\d{10})`)
 	_cusipRe         = regexp.MustCompile(`CUSIP ([0-9]{3}[a-zA-Z0-9]{6})`)
 	_transactionRe   = regexp.MustCompile(`(?P<date>\d{2} [a-zA-Z]{3} \d{4})(?P<description>\D*)(?P<transaction_amount>[0-9.,]+) (?P<deduction_amount>[0-9.,]+)(?P<deduction_type>\D*)(?P<net_amount>[0-9.,]+) (?P<price_per_share>[0-9.,]+) (?P<total_shares>[0-9.,]+)`)
+
+	_txIDSalt      = os.Getenv("TX_ID_SALT")
+	_accountIDSalt = os.Getenv("ACCOUNT_ID_SALT")
 
 	_transactionDateLayout = "2 Jan 2006"
 )
@@ -182,6 +188,22 @@ func scanMeta(b []byte) error {
 		return errors.New("invalid subject")
 	}
 	return nil
+}
+
+func (td *Transaction) ToStore(requester string) store.Transaction {
+	return store.Transaction{
+		IDHash:          fmt.Sprintf("%x", sha256.Sum256([]byte(_txIDSalt+td.ID))),
+		AccountIDHash:   fmt.Sprintf("%x", sha256.Sum256([]byte(_accountIDSalt+td.AccountID))),
+		Date:            td.Date,
+		RequesterHash:   requester,
+		CUSIP:           td.CUSIP,
+		Description:     td.Description,
+		Amount:          td.Amount,
+		DeductionAmount: td.DeductionAmount,
+		NetAmount:       td.NetAmount,
+		PricePerShare:   td.PricePerShare,
+		TotalShares:     td.TotalShares,
+	}
 }
 
 func boundingBoxesFromImage(src image.Image) ([]gosseract.BoundingBox, error) {
