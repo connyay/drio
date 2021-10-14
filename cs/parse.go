@@ -234,41 +234,44 @@ func (td *Transaction) verify(doc *fitz.Document) error {
 	if td.AccountID == "" {
 		return errors.New("missing account ID")
 	}
-	for n := 0; n < doc.NumPage(); n++ {
-		img, err := doc.Image(n)
-		if err != nil {
-			return fmt.Errorf("reading image %w", err)
-		}
-		src := barcode.NewImage(img)
-		scanner := barcode.NewScanner().
-			SetEnabledAll(true)
-		symbols, err := scanner.ScanImage(src)
-		if err != nil {
-			return fmt.Errorf("scanning image on page %d %w", n, err)
-		}
-		if len(symbols) != 1 {
-			log.Printf("unusual barcode symbol len %d", len(symbols))
-			return errors.New("unexpected number of symbols")
-		}
-
-		accountBarcode := symbols[0]
-
-		if accountBarcode.Type != barcode.Code39 {
-			log.Printf("unusual barcode type %v", accountBarcode.Type)
-			return errors.New("unexpected symbol type")
-		}
-		// Quality is a bit of a guess. It is an unscaled value, so it could be
-		// anything.
-		if accountBarcode.Quality < 100 {
-			log.Printf("unusual barcode quality %v", accountBarcode.Quality)
-			return errors.New("unexpected symbol quality")
-		}
-
-		if accountBarcode.Data != td.AccountID {
-			log.Printf("accountID not verified expected %q got %q", td.AccountID, accountBarcode.Data)
-			return errors.New("accountID not verified")
-		}
+	// for n := 0; n < doc.NumPage(); n++ {
+	// only validating the first page for now to reduce load. If abuse
+	// becomes rampant will likely have to scan all pages
+	n := 0
+	img, err := doc.Image(n)
+	if err != nil {
+		return fmt.Errorf("reading image %w", err)
 	}
+	src := barcode.NewImage(img)
+	scanner := barcode.NewScanner().
+		SetEnabledAll(true)
+	symbols, err := scanner.ScanImage(src)
+	if err != nil {
+		return fmt.Errorf("scanning image on page %d %w", n, err)
+	}
+	if len(symbols) != 1 {
+		log.Printf("unusual barcode symbol len %d", len(symbols))
+		return errors.New("unexpected number of symbols")
+	}
+
+	accountBarcode := symbols[0]
+
+	if accountBarcode.Type != barcode.Code39 {
+		log.Printf("unusual barcode type %v", accountBarcode.Type)
+		return errors.New("unexpected symbol type")
+	}
+	// Quality is a bit of a guess. It is an unscaled value, so it could be
+	// anything.
+	if accountBarcode.Quality < 100 {
+		log.Printf("unusual barcode quality %v", accountBarcode.Quality)
+		return errors.New("unexpected symbol quality")
+	}
+
+	if accountBarcode.Data != td.AccountID {
+		log.Printf("accountID not verified expected %q got %q", td.AccountID, accountBarcode.Data)
+		return errors.New("accountID not verified")
+	}
+	// }
 	// Basic math sanity check
 	switch {
 	case !td.ClosePosition.Sub(td.OpenPosition).Equal(td.TotalShares):
