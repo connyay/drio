@@ -41,6 +41,15 @@ work to fake.
 
 The request IP address is hashed and recorded to allow blocking abuse.
 
+## Trust
+
+This application is fully open source to allow inspecting the logic to ensure
+that documents aren't being secretly stored, account numbers or addresses aren't
+being harvested, and in general no malicious actions are being performed.
+
+The application is built and deployed by github to remove humans from
+deployment. What you see in the source tree is what is running.
+
 ## Web App
 
 A simple webapp is available to upload documents and display totals and
