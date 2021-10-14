@@ -33,7 +33,7 @@ type ServeCmd struct {
 func (cmd *ServeCmd) Run() error {
 	log := logrus.New()
 	r := chi.NewRouter()
-	r.Use(WithLogging(log))
+	r.Use(logging(log))
 	r.Use(middleware.Recoverer)
 	var (
 		s   store.Store
@@ -61,7 +61,7 @@ func (cmd *ServeCmd) Run() error {
 	return http.ListenAndServe(cmd.Addr, r)
 }
 
-func WithLogging(logger logrus.FieldLogger) func(h http.Handler) http.Handler {
+func logging(logger logrus.FieldLogger) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
