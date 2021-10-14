@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/bieber/barcode"
-	"github.com/connyay/drclub/store"
+	"github.com/connyay/drio/store"
 	"github.com/karmdip-mi/go-fitz"
 	"github.com/otiai10/gosseract/v2"
 	"github.com/shopspring/decimal"

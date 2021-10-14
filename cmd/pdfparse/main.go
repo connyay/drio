@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/connyay/drclub/cs"
+	"github.com/connyay/drio/cs"
 	"github.com/davecgh/go-spew/spew"
 )
 

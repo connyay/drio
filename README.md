@@ -1,4 +1,4 @@
-# drclub
+# drio
 
 ## What is this
 
@@ -73,7 +73,7 @@ $ go run ./cmd/pdfparse /path/to/document.pdf
 
 RUN pg in docker:
 
-`docker run -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=drclub -d postgres:13.2`
+`docker run -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=drio -d postgres:13.2`
 
 copy & export .env file
 

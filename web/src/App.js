@@ -13,7 +13,7 @@ function App() {
       <div className="container">
         <div className="row" style={{ marginTop: "10%" }}>
           <div className="two-thirds column">
-            <h4>Direct Register Club</h4>
+            <h4>Direct Registration</h4>
             <p>
               Self reported transactions and positions. This is not financial
               advice.
@@ -24,7 +24,11 @@ function App() {
           <Upload refresh={refresh} />
         </div>
         <Totals key={`${refreshKey}totals`} />
-        <Route path="/transactions" component={Transactions} key={`${refreshKey}transactions`} />
+        <Route
+          path="/transactions"
+          component={Transactions}
+          key={`${refreshKey}transactions`}
+        />
       </div>
     </Router>
   );

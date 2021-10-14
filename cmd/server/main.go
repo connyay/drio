@@ -12,9 +12,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 
-	"github.com/connyay/drclub/api"
-	"github.com/connyay/drclub/store"
-	"github.com/connyay/drclub/web"
+	"github.com/connyay/drio/api"
+	"github.com/connyay/drio/store"
+	"github.com/connyay/drio/web"
 )
 
 var cli struct {

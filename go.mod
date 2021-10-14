@@ -1,4 +1,4 @@
-module github.com/connyay/drclub
+module github.com/connyay/drio
 
 go 1.16
 

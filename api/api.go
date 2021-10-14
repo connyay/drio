@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/connyay/drclub/cs"
-	"github.com/connyay/drclub/store"
+	"github.com/connyay/drio/cs"
+	"github.com/connyay/drio/store"
 	"github.com/sirupsen/logrus"
 )
 
