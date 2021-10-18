@@ -271,7 +271,6 @@ func (td *Transaction) verify(doc *fitz.Document) error {
 		log.Printf("accountID not verified expected %q got %q", td.AccountID, accountBarcode.Data)
 		return errors.New("accountID not verified")
 	}
-	// }
 	// Basic math sanity check
 	switch {
 	case !td.ClosePosition.Sub(td.OpenPosition).Equal(td.TotalShares):
