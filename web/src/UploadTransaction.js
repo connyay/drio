@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const uploadURL = `${process.env.REACT_APP_API || ""}/api/transactions`;
 
@@ -26,9 +27,11 @@ function Upload({ refresh } = { refresh: () => {} }) {
           setRenderKey(Date.now());
           refresh();
           setFile(null);
+          toast("Successfully uploaded");
         })
         .catch((err) => {
           console.error("failed import", err);
+          toast.error(`Failed upload ${err}`);
         })
         .finally(() => setLoading(false));
     },
