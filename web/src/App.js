@@ -17,12 +17,22 @@ function App() {
           <div className="two-thirds column">
             <h4>Direct Registration</h4>
             <p>
-              Self reported transactions and positions. This is not financial
-              advice.
+              Self-reported transactions and positions. This is for
+              informational purposes only and is not financial advice. Conduct
+              your own due diligence, or consult a licensed financial advisor or
+              broker before making any and all investment decisions.
+            </p>
+            <p>
+              <a
+                href="https://github.com/connyay/drio#drio"
+                title="connyay/drio on github"
+              >
+                Read more about this project and review the source on github.
+              </a>
             </p>
           </div>
         </div>
-        <div className="row">
+        <div className="row" style={{ marginBottom: "15px" }}>
           <Upload refresh={refresh} />
         </div>
         <Totals key={`${refreshKey}totals`} />
