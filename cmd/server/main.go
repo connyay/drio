@@ -47,7 +47,7 @@ func (cmd *ServeCmd) Run() error {
 	r.NotFound(func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet &&
 			(r.RequestURI == "/" ||
-				r.RequestURI == "favicon.ico" ||
+				r.RequestURI == "/favicon.ico" ||
 				strings.HasPrefix(r.RequestURI, "/static/") ||
 				strings.HasPrefix(r.RequestURI, "/transactions")) {
 			web.AssetHandler(rw, r)
