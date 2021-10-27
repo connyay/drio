@@ -48,7 +48,8 @@ func (cmd *ServeCmd) Run() error {
 		if r.Method == http.MethodGet &&
 			(r.RequestURI == "/" ||
 				r.RequestURI == "favicon.ico" ||
-				strings.HasPrefix(r.RequestURI, "/static/")) {
+				strings.HasPrefix(r.RequestURI, "/static/") ||
+				strings.HasPrefix(r.RequestURI, "/transactions")) {
 			web.AssetHandler(rw, r)
 			return
 		}
