@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Upload from "./UploadTransaction";
 import Totals from "./Totals";
@@ -30,6 +32,7 @@ function App() {
           key={`${refreshKey}transactions`}
         />
       </div>
+      <ToastContainer />
     </Router>
   );
 }

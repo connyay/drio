@@ -12,7 +12,7 @@ require (
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/karmdip-mi/go-fitz v0.0.0-20210702102225-a530a79566e9
 	github.com/otiai10/gosseract/v2 v2.3.1
-	github.com/shopspring/decimal v1.2.0
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/shopspring/decimal v1.3.0
+	github.com/sirupsen/logrus v1.8.1
 	gocv.io/x/gocv v0.28.0 // indirect
 )
