@@ -3,7 +3,7 @@ import axios from "axios";
 
 const transactionsURL = `${process.env.REACT_APP_API || ""}/api/transactions`;
 
-function Transactions({ location }) {
+function Transactions({ location, history }) {
   const [txs, setTxs] = useState([]);
 
   const params = useMemo(
@@ -26,6 +26,7 @@ function Transactions({ location }) {
   }, [params, cusip]);
 
   if (!cusip) {
+    history.push("/");
     return null;
   }
   if (!txs.length) {
@@ -41,6 +42,7 @@ function Transactions({ location }) {
           <tr>
             <th>Date</th>
             <th>Account</th>
+            <th>Description</th>
             <th>PPS</th>
             <th>Shares</th>
           </tr>
@@ -49,7 +51,10 @@ function Transactions({ location }) {
           {txs.map((tx) => (
             <tr key={tx.id_hash}>
               <td>{tx.date.slice(0, 10)}</td>
-              <td title={tx.account_id_hash}>{tx.account_id_hash.slice(0, 10)}...</td>
+              <td title={tx.account_id_hash}>
+                {tx.account_id_hash.slice(0, 7)}...
+              </td>
+              <td>{tx.description}</td>
               <td>{tx.price_per_share}</td>
               <td>{tx.total_shares}</td>
             </tr>

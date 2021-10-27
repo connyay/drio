@@ -44,7 +44,17 @@ func (cmd *ServeCmd) Run() error {
 	r.Post("/api/transactions", api.TransactionCreateHandler(store, log))
 	r.Get("/api/transactions", api.TransactionListHandler(store, log))
 	r.Get("/api/totals", api.TotalsHandler(store, log))
-	r.NotFound(web.AssetHandler)
+	r.NotFound(func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet &&
+			(r.RequestURI == "/" ||
+				r.RequestURI == "/favicon.ico" ||
+				strings.HasPrefix(r.RequestURI, "/static/") ||
+				strings.HasPrefix(r.RequestURI, "/transactions")) {
+			web.AssetHandler(rw, r)
+			return
+		}
+		rw.WriteHeader(http.StatusNotFound)
+	})
 	log.Printf("Listening on %s", cmd.Addr)
 	return http.ListenAndServe(cmd.Addr, r)
 }

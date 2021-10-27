@@ -17,3 +17,4 @@
 .env
 
 bb_*.json
+.DS_Store

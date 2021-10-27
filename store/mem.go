@@ -38,6 +38,7 @@ func (ms *memStore) InsertTransaction(transaction Transaction) error {
 func (ms *memStore) GetTransactions(CUSIP string) (transactions []Transaction, err error) {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
+	transactions = make([]Transaction, 0)
 	for _, transaction := range ms.transactions {
 		if transaction.CUSIP == CUSIP {
 			transactions = append(transactions, transaction)
