@@ -44,7 +44,11 @@ func (cmd *ServeCmd) Run() error {
 	r.Post("/api/transactions", api.TransactionCreateHandler(store, log))
 	r.Get("/api/transactions", api.TransactionListHandler(store, log))
 	r.Get("/api/totals", api.TotalsHandler(store, log))
-	r.NotFound(web.AssetHandler)
+	r.Get("/static", web.AssetHandler)
+	r.Get("/transactions", web.AssetHandler)
+	r.NotFound(func(rw http.ResponseWriter, r *http.Request) {
+		rw.WriteHeader(http.StatusNotFound)
+	})
 	log.Printf("Listening on %s", cmd.Addr)
 	return http.ListenAndServe(cmd.Addr, r)
 }
