@@ -12,6 +12,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	_maxDocumentSizeBytes = 300 * 1024
+)
+
 func TransactionCreateHandler(db store.Store, log *logrus.Logger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 		if ct := req.Header.Get("Content-Type"); ct != "application/pdf" {
@@ -19,7 +23,7 @@ func TransactionCreateHandler(db store.Store, log *logrus.Logger) http.HandlerFu
 			return
 		}
 		defer req.Body.Close()
-		docBytes, err := io.ReadAll(io.LimitReader(req.Body, 200*1024))
+		docBytes, err := io.ReadAll(io.LimitReader(req.Body, _maxDocumentSizeBytes))
 		if err != nil {
 			log.WithFields(logrus.Fields{
 				"err":        err,
